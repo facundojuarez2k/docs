@@ -141,7 +141,7 @@ RUN cp -r /build/target/extracted/dependencies/. ./
 RUN cp -r /build/target/extracted/spring-boot-loader/. ./
 RUN cp -r /build/target/extracted/snapshot-dependencies/. ./
 RUN cp -r /build/target/extracted/application/. ./
-CMD [ "java", "-Dspring.profiles.active=postgres", "-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000'", "org.springframework.boot.loader.launch.JarLauncher" ]
+CMD [ "java", "-Dspring.profiles.active=postgres", "org.springframework.boot.loader.launch.JarLauncher" ]
 
 FROM eclipse-temurin:17-jre-jammy AS final
 ARG UID=10001
@@ -188,6 +188,8 @@ services:
         condition: service_healthy
     environment:
       - POSTGRES_URL=jdbc:postgresql://db:5432/petclinic
+      - JAVA_TOOL_OPTIONS=
+          -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000
   db:
     image: postgres
     restart: always
@@ -211,7 +213,7 @@ volumes:
 Now, start your application and to confirm that it's running.
 
 ```console
-$ docker compose up --build
+$ docker compose -f docker-compose.dev.yml up --build
 ```
 
 Finally, test your API endpoint. Run the following curl command:
